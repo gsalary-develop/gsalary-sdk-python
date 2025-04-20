@@ -152,7 +152,7 @@ class GSalaryClient:
         _http_req = Request(
             url=self._config.concat_path(request.path_with_args(True)),
             method=request.method,
-            data=request.body if request.has_body() else None,
+            data=json.dumps(request.body).encode('utf-8') if request.has_body() else None,
             headers=_headers
         )
         logger.debug(f'submitting gsalary request {request.method} to {_http_req.full_url}')
@@ -162,7 +162,7 @@ class GSalaryClient:
                 logger.debug(f'gsalary response: {response_data}')
                 if response.status == 200:
                     auth_header = from_header_value(response.headers['Authorization'])
-                    if not auth_header.valid():
+                    if not auth_header.valid:
                         logger.error('Invalid authorization header')
                         raise ValueError('Invalid authorization header')
                     verified = request.verify_signature(self._config,
