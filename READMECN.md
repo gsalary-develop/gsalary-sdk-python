@@ -8,7 +8,7 @@ API文档:
 ## 导入
 
 ```bash
-pip install gsalary_sdk
+pip install gsalary-sdk
 ```
 
 ## 配置

@@ -8,7 +8,7 @@ API Document:
 ## Import
 
 ```bash
-pip install gsalary_sdk
+pip install gsalary-sdk
 ```
 
 ## Prepare
