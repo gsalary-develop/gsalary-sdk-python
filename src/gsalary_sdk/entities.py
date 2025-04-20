@@ -34,6 +34,8 @@ class GSalaryConfig:
             value = value[len('-----BEGIN PUBLIC KEY-----'):].strip()
         if value.endswith('-----END PUBLIC KEY-----'):
             value = value[:-len('-----END PUBLIC KEY-----')].strip()
+        if value.strip().count('\n') > 0:
+            return value  # 已经有换行符，无需再次插入
         # 按每 64 个字符插入一个换行符
         return '\n'.join(value[i:i + 64] for i in range(0, len(value), 64))
 

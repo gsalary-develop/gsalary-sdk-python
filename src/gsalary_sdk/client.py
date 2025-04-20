@@ -91,6 +91,8 @@ class GSalaryRequest:
         return self._method
 
     def path_with_args(self, escape: bool = False):
+        if self._query_args is None or len(self._query_args) == 0:
+            return self._path
         return self._path + '?' + url_encode(self._query_args, escape)
 
     def _get_body_hash(self):
@@ -113,7 +115,7 @@ class GSalaryRequest:
 
     def verify_signature(self, config: GSalaryConfig, header_info: AuthoriseHeaderInfo, body: str):
         body_hash = base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode('utf-8')
-        sign_base = sign_base = f'{self.method} {self.path_with_args(False)}\n{config.appid}\n{header_info.timestamp}\n{body_hash}\n'
+        sign_base = f'{self.method} {self.path_with_args(False)}\n{config.appid}\n{header_info.timestamp}\n{body_hash}\n'
         logger.debug(f'sign base for verify: {sign_base}')
         try:
             public_key = config.server_public_key
@@ -159,16 +161,28 @@ class GSalaryClient:
                 response_data = response.read().decode('utf-8')
                 logger.debug(f'gsalary response: {response_data}')
                 if response.status == 200:
+                    auth_header = from_header_value(response.headers['Authorization'])
+                    if not auth_header.valid():
+                        logger.error('Invalid authorization header')
+                        raise ValueError('Invalid authorization header')
                     verified = request.verify_signature(self._config,
-                                                        from_header_value(response.headers['Authorization']),
+                                                        auth_header,
                                                         response_data)
                     if not verified:
                         logger.error('Signature verification failed')
                         raise ValueError('Signature verification failed')
-                    return json.loads(response_data)
+                    try:
+                        return json.loads(response_data)
+                    except json.JSONDecodeError:
+                        logger.error(f'Non-JSON response: {response_data}')
+                        raise ValueError(f'Unexpected response format: {response_data}')
                 else:
-                    body = json.loads(response_data)
-                    raise GSalaryException(body.get('biz_result'), body.get('error_code'), body.get('message'))
+                    try:
+                        body = json.loads(response_data)
+                        raise GSalaryException(body.get('biz_result'), body.get('error_code'), body.get('message'))
+                    except json.JSONDecodeError:
+                        logger.error(f'Non-JSON response: {response_data}')
+                        raise ValueError(f'Unexpected response format: {response_data}')
         except HTTPError as e:
             try:
                 err_content = e.read().decode('utf-8')
