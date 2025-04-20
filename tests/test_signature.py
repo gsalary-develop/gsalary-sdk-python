@@ -1,6 +1,6 @@
 import json
 import logging
-from client import GSalaryClient, GSalaryConfig, GSalaryRequest
+from gsalary_sdk import GSalaryClient, GSalaryConfig, GSalaryRequest
 import os
 
 # init logger to print on console
@@ -8,6 +8,7 @@ logger = logging.getLogger('gsalary-cli')
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
+
 
 def test_list_cards(cli: GSalaryClient):
     req = GSalaryRequest('GET', '/v1/cards', query_args={'page': '1', 'limit': '20'})

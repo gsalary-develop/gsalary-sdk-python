@@ -16,8 +16,9 @@ pip install gsalary_sdk
 Configure your appid, client-side private key, server-side public key and endpoint to the GSalary Client.
 
 The endpoint shall not contain the context path.
+
 ```python
-from client import GSalaryClient, GSalaryConfig
+from gsalary_sdk import GSalaryClient, GSalaryConfig
 
 config = GSalaryConfig()
 config.appid = 'aaaaaaa'
@@ -34,13 +35,12 @@ _cli = GSalaryClient(config)
 ### POST request example
 
 ```python
-from client import GSalaryRequest
-
+from gsalary_sdk import GSalaryRequest
 
 path = "/v1/exchange/quotes"
 request_body = dict(sell_currency='USD',
-                   buy_currency='CNY',
-                   sell_amount=0.1)
+                    buy_currency='CNY',
+                    sell_amount=0.1)
 
 request = GSalaryRequest('POST', path, body=request_body)
 resp = _cli.request(request)
@@ -49,7 +49,8 @@ resp = _cli.request(request)
 ### GET request example
 
 ```python
-from client import GSalaryRequest
+from gsalary_sdk import GSalaryRequest
+
 path = "/v1/cards"
 
 args = dict(create_start="2024-02-01T00:00:00+00:00",
@@ -57,6 +58,6 @@ args = dict(create_start="2024-02-01T00:00:00+00:00",
             page='1',
             limit='20')
 
-request = GSalaryRequest('GET',path, query_args=args)
+request = GSalaryRequest('GET', path, query_args=args)
 resp = _cli.request(request)
 ```

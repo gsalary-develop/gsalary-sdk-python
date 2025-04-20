@@ -6,7 +6,8 @@ setup(
     author='Astro',
     author_email='astro.dai@globalfreepay.com',
     url='https://github.com/gsalary-develop/gsalary-sdk-python',
-    packages=['clients'],
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
     description='gsalary python sdk',
     install_requires=['cryptography']
 )
